@@ -40,10 +40,10 @@ execute_GibbsMH <- function(B, seed, start_lambda, start_theta, tune_a, tune_b){
 		# # DEBUG ONLY
 		# t <- 2
 		
-		### sample lambda ###
+		### sample lambda ##
 		lambda[t] <- rgamma(1, n+2, sum(data^theta[t-1]))^(-1/theta[t-1])
 		
-		### sample theta ###
+		### sample theta ##
 		thstar <- rgamma(1, tune_a, tune_b)
 		aprob  <- min(1, 
 									( fcth(lambda[t-1], thstar, data) / 
