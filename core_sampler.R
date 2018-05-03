@@ -16,13 +16,13 @@ fcth <- function(lambda, theta, data) {
 ## Implement sampler
 execute_GibbsMH <- function(B, seed, start_lambda, start_theta, tune_a, tune_b){
 	
-	# DEBUG ONLY
-	B = 10000 
-	seed = 1234 
-	start_lambda = 1.07 
-	start_theta = 2 
-	tune_a = 1.07 
-	tune_b = 1
+	# # DEBUG ONLY
+	# B = 10000 
+	# seed = 1234 
+	# start_lambda = 1.07 
+	# start_theta = 2 
+	# tune_a = 1.07 
+	# tune_b = 1
 	
 	set.seed(seed)
 	
@@ -37,8 +37,8 @@ execute_GibbsMH <- function(B, seed, start_lambda, start_theta, tune_a, tune_b){
 	n	<- length(data)
 	
 	for(t in 2:B){
-		# DEBUG ONLY
-		t <- 2
+		# # DEBUG ONLY
+		# t <- 2
 		
 		### sample lambda ###
 		lambda[t] <- rgamma(1, n+2, sum(data^theta[t-1]))^(-1/theta[t-1])
