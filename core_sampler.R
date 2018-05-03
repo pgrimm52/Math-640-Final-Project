@@ -3,6 +3,19 @@
 # Load data
 data <- readRDS("tweetstorm_data.rds")
 
+# Experiment with different pdfs
+## Exponential
+hist(data)
+curve(10e2*dexp(x, 0.5), xlim=c(0,10), add=TRUE, col="blue")
+mean(rgamma(10000, length(data), sum(data)))
+curve(10e2*dexp(x, 0.62), xlim=c(0,10), add=TRUE, col="red")
+
+## Weibull(shape=theta, scale=lambda)
+hist(data)
+curve(10e2*dweibull(x, 1.1, 1.5), add=TRUE, col="red")
+curve(dgamma(x, 1.11, 1), xlim=c(0,10)) # for theta
+mean(rgamma(10000, 1.11, 1))
+
 # Sampler implementation
 ##  Full conditional theta
 fcth <- function(lambda, theta, data) {
@@ -17,12 +30,12 @@ fcth <- function(lambda, theta, data) {
 execute_GibbsMH <- function(B, seed, start_lambda, start_theta, tune_a, tune_b){
 	
 	# # DEBUG ONLY
-	# B = 10000 
-	# seed = 1234 
-	# start_lambda = 1.07 
-	# start_theta = 2 
-	# tune_a = 1.07 
-	# tune_b = 1
+	B = 1000
+	seed = 42
+	start_lambda = 1.5
+	start_theta = 1.1
+	tune_a = 1.11
+	tune_b = 1
 	
 	set.seed(seed)
 	
@@ -38,7 +51,7 @@ execute_GibbsMH <- function(B, seed, start_lambda, start_theta, tune_a, tune_b){
 	
 	for(t in 2:B){
 		# # DEBUG ONLY
-		# t <- 2
+		t <- 2
 		
 		### sample lambda ##
 		lambda[t] <- rgamma(1, n+2, sum(data^theta[t-1]))^(-1/theta[t-1])
@@ -65,11 +78,11 @@ execute_GibbsMH <- function(B, seed, start_lambda, start_theta, tune_a, tune_b){
 }
 
 execute_GibbsMH(
-	B = 10000,
-	seed = 1234,
-	start_lambda = 1.07,
-	start_theta = 2,
-	tune_a = 1.07,
+	B = 1000,
+	seed = 42,
+	start_lambda = 1.5,
+	start_theta = 1.1,
+	tune_a = 1.11,
 	tune_b = 1)
 # RESULT: Error in if (U < aprob) { : missing value where TRUE/FALSE needed
 # Reason: fcth (full conditional theta) = NaN
