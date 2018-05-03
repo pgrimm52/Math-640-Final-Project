@@ -141,3 +141,21 @@ chain1 <- execute_GibbsMH(
 	start_lambda = 1.07, start_theta = 2, 
 	tune_a = 1.07, tune_b = 1)
 chain1$ar
+
+
+
+### EXTRA STARTING VALUE TINKERING
+# Exam 2 starting value tinkering
+hist(data)
+curve(20e2*dweibull(x, 1.14, 165), xlim=c(0,500), add=TRUE, col="blue")
+
+mean(rweibull(10000, 1.14, 165))
+
+hist(data2)
+curve(10e2*dweibull(x, 1.07, 2), add=TRUE, col="blue")
+# ideal shape = 1.07, scale = 2
+
+# shape comes from M-H
+curve(dgamma(x, 1.07, 1), xlim=c(0, 10))
+curve(dgamma(x, 1.07, 1), xlim=c(0, 10), add=TRUE)
+mean(rgamma(10000, 1.07, 1))
