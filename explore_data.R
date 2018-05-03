@@ -66,6 +66,8 @@ qplot(time_elapsed, data=pilot_data)
 
 # Load data
 data <- pilot_data$time_elapsed[!is.na(pilot_data$time_elapsed)]
+data2 <- pilot_data$time_elapsed[!is.na(pilot_data$time_elapsed)]
+saveRDS(data2, "tweetstorm_data.rds")
 
 # Full conditional theta
 fcth <- function(lambda, theta, data) {
@@ -77,7 +79,15 @@ fcth <- function(lambda, theta, data) {
 }
 
 # Implement sampler
-execute_GibbsMH_q2 <- function(B, seed, start_lambda, start_theta, tune_a, tune_b){
+execute_GibbsMH <- function(B, seed, start_lambda, start_theta, tune_a, tune_b){
+	
+	# DEBUG ONLY
+	B = 10000 
+	seed = 1234 
+	start_lambda = 1.07 
+	start_theta = 2 
+	tune_a = 1.07 
+	tune_b = 1
 	
 	set.seed(seed)
 	
@@ -92,6 +102,9 @@ execute_GibbsMH_q2 <- function(B, seed, start_lambda, start_theta, tune_a, tune_
 	n	<- length(data)
 	
 	for(t in 2:B){
+		# DEBUG ONLY
+		t <- 2
+		
 		### sample lambda ###
 		lambda[t] <- rgamma(1, n+2, sum(data^theta[t-1]))^(-1/theta[t-1])
 		
@@ -100,8 +113,8 @@ execute_GibbsMH_q2 <- function(B, seed, start_lambda, start_theta, tune_a, tune_
 		aprob  <- min(1, 
 									( fcth(lambda[t-1], thstar, data) / 
 											fcth(lambda[t-1], theta[t-1], data) ) /
-										( dgamma(thstar, tune_a, tune_b) / 
-												dgamma(theta[t-1], tune_a, tune_b) ) )
+									( dgamma(thstar, tune_a, tune_b) / 
+											dgamma(theta[t-1], tune_a, tune_b) ) )
 		U <- runif(1)
 		if(U < aprob){
 			th <- thstar
@@ -116,32 +129,15 @@ execute_GibbsMH_q2 <- function(B, seed, start_lambda, start_theta, tune_a, tune_
 		ar = mean(ar)))
 }
 
-tune_acceptance_rate <- function(a_vals, b_vals){
-	
-	acceptance_grid <- matrix(NA, nrow = length(a_vals), ncol = length(b_vals))
-	for (i in 1:nrow(acceptance_grid)){
-		for (j in 1:ncol(acceptance_grid)){
-			acceptance_grid[i, j] <- execute_GibbsMH_q2(B = 50000, seed = 121, 
-																									start_lambda = 1, 
-																									start_theta = 0.1, 
-																									tune_a = a_vals[i], 
-																									tune_b = b_vals[j])$ar
-		}
-	}
-	dimnames(acceptance_grid) <- list(a_vals, b_vals)
-	return(acceptance_grid)
-}
-
 # Proposal distribution
 hist(sampler_data)
 plot(sampler_data)
 curve(dgamma(x, 5, 2), col="blue", lty=2, lwd=2, add=TRUE)
 curve(dgamma(x, 200, 1), col="blue", lty=2, lwd=2, xlim=c(0,500))
 
-
 # Execute sampler
-chain1 <- execute_GibbsMH_q2(
+chain1 <- execute_GibbsMH(
 	B = 10000, seed = 1234, 
-	start_lambda = 1, start_theta = 0.1, 
-	tune_a = 200, tune_b = 1)
+	start_lambda = 1.07, start_theta = 2, 
+	tune_a = 1.07, tune_b = 1)
 chain1$ar
