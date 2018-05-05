@@ -12,6 +12,8 @@ library(lubridate)
 library(stringr)
 library(ggplot2)
 library(dbscan)
+library(mcmcplots)
+library(MCMCpack)
 
 # Build dataset (JSON source: https://github.com/bpb27/trump_tweet_data_archive)
 tweets <- fromJSON("condensed_2018.json") %>% 
