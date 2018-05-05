@@ -7,4 +7,4 @@
 
 ## Questions for Mark
 
-* How to interpret diagnostics for tweetstorm variable (correlation, etc.)? (sandbox.R)
+* How to interpret diagnostics for tweetstorm variable (correlation, etc.) & how this affects modeling assumptions (sandbox.R)
