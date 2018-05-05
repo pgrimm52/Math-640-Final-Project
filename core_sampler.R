@@ -2,6 +2,7 @@
 
 # Load data
 data <- readRDS("tweetstorm_data.rds")
+# write.csv(data, "tweetstorm_data.csv")
 
 # Experiment with different pdfs
 ## Exponential
@@ -11,9 +12,9 @@ mean(rgamma(10000, length(data), sum(data)))
 curve(10e2*dexp(x, 0.62), xlim=c(0,10), add=TRUE, col="red")
 
 ## Weibull(shape=theta, scale=lambda)
-hist(data)
-curve(10e2*dweibull(x, 1.1, 1.5), add=TRUE, col="red")
-curve(dgamma(x, 1.11, 1), xlim=c(0,10)) # for theta
+hist(t, breaks=100)
+curve(10e1*dweibull(x, 0.85, 1.5), add=TRUE, col="red")
+curve(10e1*dgamma(x, 1.5, 1), xlim=c(0,10), add=TRUE) # for theta
 mean(rgamma(10000, 1.11, 1))
 
 # Sampler implementation

@@ -7,6 +7,15 @@ library(lubridate)
 library(stringr)
 library(ggplot2)
 library(dbscan)
+library(MCMCpack)
+library(mcmcplots)
+
+# helper functions
+mcmcplot2 <- function(samp, name){
+	mat <- matrix(samp, ncol=1)
+	colnames(mat) <- name
+	mcmcplot1(mat)
+}
 
 # load data
 data <- readRDS("trump_tweets.rds") %>%
