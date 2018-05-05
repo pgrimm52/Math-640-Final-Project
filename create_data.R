@@ -51,32 +51,23 @@ tweets$date <- ymd_hms(paste(
 # 	summarize(n = n()) %>%
 # 	ggplot(aes(x = month_day, y = n, color = source)) + geom_line()
 
-# Build tweet subset
+# Build tweet subset (use android until Mar 8, 2017)
 t1 <- tweets %>%
 	filter(source == "Twitter for Android",
 				 date > ymd(20151108),
-				 date < ymd(20161108),
-				 !is_retweet,
-				 !str_detect(text, '^"')) %>%
-	mutate(election = "pre")
-
-t2 <- tweets %>%
-	filter(source == "Twitter for Android",
-				 date > ymd(20161108),
 				 date < ymd(20170308),
 				 !is_retweet,
-				 !str_detect(text, '^"')) %>%
-	mutate(election = "post")
+				 !str_detect(text, '^"'))
 
-t3 <- tweets %>%
+t2 <- tweets %>%
 	filter(source == "Twitter for iPhone",
 				 date > ymd(20170308),
 				 date < ymd(20171108),
 				 !is_retweet,
-				 !str_detect(text, '^"')) %>%
-	mutate(election = "post")
+				 !str_detect(text, '^"'))
 
-tweets_subset <- bind_rows(t1, t2, t3)
+tweets_subset <- bind_rows(t1, t2) %>%
+	mutate(post_election = date > ymd(20161109))
 
 # Get tweetstorms via clustering, save full dataset for text analysis
 tweets_subset$cluster <- dbscan(as.matrix(tweets_subset$date), 
@@ -102,20 +93,21 @@ saveRDS(tweets_subset, "tweets_subset.rds")
 # 	slice(-n()) %>%
 # 	ggplot(aes(date)) + geom_histogram(bins=24)
 
-# Output simple tweet_storms vector (measured in days elapsed), save dataset
+# Output simple tweet_storms dataset (measured in days elapsed), save dataset
 tweet_storms <- tweets_subset %>%
 	filter(cluster != 0) %>%
 	group_by(cluster) %>%
 	summarize(date = mean(date)) %>%
 	arrange(desc(date)) %>%
 	mutate(previous = lead(date),
-				 days_elapsed = as.duration(date - previous)/ddays(1)) %>% # time_elapsed converted to days
+				 days_elapsed = as.duration(date - previous)/ddays(1),
+				 post_election = date > ymd(20161109)) %>% # time_elapsed converted to days
 	slice(-n()) %>% # omit last value (= NA)
-	pull(days_elapsed)
+	dplyr::select(days_elapsed, post_election)
 
 saveRDS(tweet_storms, "tweet_storms.rds")
 
 # # Shape of tweetstorms is Gamma-like (magic!)
-# qplot(tweet_storms)
-# hist(tweet_storms, xlim=c(0, 30))
+# qplot(days_elapsed, data=tweet_storms, color=post_election, geom="density")
+# hist(tweet_storms$days_elapsed, xlim=c(0, 30))
 # curve(5e2*dweibull(x, 0.91, 2.87), add=TRUE, col="red")
