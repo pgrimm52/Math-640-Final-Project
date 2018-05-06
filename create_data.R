@@ -14,6 +14,7 @@ library(ggplot2)
 library(dbscan)
 library(mcmcplots)
 library(MCMCpack)
+library(moments)
 
 # Build dataset (JSON source: https://github.com/bpb27/trump_tweet_data_archive)
 tweets <- fromJSON("condensed_2018.json") %>% 
@@ -26,7 +27,8 @@ tweets <- fromJSON("condensed_2018.json") %>%
 tweets$date <- ymd_hms(paste(
 	substr(tweets$created_at, 27, 30), 
 	substr(tweets$created_at, 5, 10), 
-	substr(tweets$created_at, 12, 19)), tz="EST")
+	substr(tweets$created_at, 12, 19)), tz="UTC") %>%
+	with_tz(., tzone="America/New_York")
 
 # # Plotting overall tweet count by week
 # tweets %>%

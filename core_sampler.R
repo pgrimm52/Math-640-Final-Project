@@ -4,6 +4,13 @@
 data <- readRDS("tweetstorm_data.rds")
 # write.csv(data, "tweetstorm_data.csv")
 
+# Helper functions
+mcmcplot2 <- function(samp, name){
+	mat <- matrix(samp, ncol=1)
+	colnames(mat) <- name
+	mcmcplot1(mat)
+}
+
 # Experiment with different pdfs
 ## Exponential
 hist(data)
