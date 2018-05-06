@@ -4,6 +4,8 @@
 
 * Explore alternative clustering parameters for tweetstorms
 * Content analysis & regression for tweet content (outcomes: count of retweets, favorites, etc.)
+* Use model selection criteria (DIC, WAIC)
+* Incorporate STAN?
 
 ## Questions for Mark
 
