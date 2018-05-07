@@ -95,7 +95,7 @@ tune_acceptance_rate <- function(a_vals, b_vals){
 
 result <- gammaSamp(
 	data = data, 
-	B = 10000, 
+	B = 40000, 
 	p = 1, q = 1, r = 1, s = 1, 
 	a1 = 34, b1 = 38, 
 	alpha_start = 1, 
