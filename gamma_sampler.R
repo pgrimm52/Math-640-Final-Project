@@ -1,9 +1,10 @@
-# Gamma sampler script
+#######################
+# Gamma sampler code
+#######################
 
-# Load data
-t <- readRDS("tweet_storms.rds") %>% pull(days_elapsed)
+#### CONJUGATE prior
 
-# Gibbs/M-H implementation
+# Posterior
 post <- function(data, p, q, r, s, alpha, beta){
 	n <- length(data)
 	return(
@@ -11,6 +12,7 @@ post <- function(data, p, q, r, s, alpha, beta){
 	)
 }
 
+# Log-Posterior
 logpost <- function(data, p, q, r, s, alpha, beta){
 	n <- length(data)
 	return(
@@ -18,7 +20,14 @@ logpost <- function(data, p, q, r, s, alpha, beta){
 	)
 }
 
-gammaSamp	<- function(data, B, p, q, r, s, a1, b1, alpha_start, beta_start){
+# Sampler implementation
+# to test: gammaSamp(data=data, B=10000, p=1, q=1, r=1, s=1, a1=1, b1=1, alpha_start=1, beta_start=1)
+gammaSamp	<- function(seed=123, data, B, 
+											p, q, r, s, 
+											a1, b1, 
+											alpha_start, beta_start){
+	
+	set.seed(seed)
 	n	<- length(data)
 	alpha	<- vector('numeric', length = B)
 	beta	<- vector('numeric', length = B)
@@ -39,8 +48,8 @@ gammaSamp	<- function(data, B, p, q, r, s, a1, b1, alpha_start, beta_start){
 		# 							( dgamma(astar, a1, b1) /
 		# 								dgamma(alpha[b-1], a1, b1) ) )
 		aprob		<- min(1,
-									exp( logpost(data, p, q, r, s, alpha = astar, beta = beta[b-1]) -
-										logpost(data, p, q, r, s, alpha = alpha[b-1], beta = beta[b-1]) ) /
+									exp( logpost(data=data, p=p, q=q, r=r, s=s, alpha = astar, beta = beta[b-1]) -
+										logpost(data=data, p=p, q=q, r=r, s=s, alpha = alpha[b-1], beta = beta[b-1]) ) /
 									( dgamma(astar, a1, b1) /
 										dgamma(alpha[b-1], a1, b1) ) )
 		u	<- runif(1)
@@ -51,52 +60,9 @@ gammaSamp	<- function(data, B, p, q, r, s, a1, b1, alpha_start, beta_start){
 		}
 	}
 
-	out				<- NULL
-	out$ar		<- ar[-(1:(B/2))]
-	out$alpha	<- alpha[-(1:(B/2))]
-	out$beta	<- beta[-(1:(B/2))]
-	return(out)
+	return(list(
+		ar = ar[-(1:(B/2))],
+		alpha	= alpha[-(1:(B/2))],
+		beta = beta[-(1:(B/2))]
+	))
 }
-
-result <- gammaSamp(
-		data = data, 
-		B = 10000, 
-		p = 1, q = 1, r = 1, s = 1, 
-		a1 = 5, b1 = 1, 
-		alpha_start = 1, 
-		beta_start = 1)
-
-lapply(result, mean)
-
-hist(t)
-curve(5e2*dgamma(x, 1.04, 0.415), add=TRUE, col="red")
-
-# Tuning
-
-tune_acceptance_rate <- function(a_vals, b_vals){
-	acceptance_grid <- matrix(NA, nrow = length(a_vals), ncol = length(b_vals))
-	for (i in 1:nrow(acceptance_grid)){
-		for (j in 1:ncol(acceptance_grid)){
-			acceptance_grid[i, j] <- mean(gammaSamp(data = t, 
-																							B = 10000,
-																							p = 1, q = 1, r = 1, s = 1, 
-																							a1 = a_vals[i], b1 = b_vals[j], 
-																							alpha_start = 1, 
-																							beta_start = 1)$ar)
-		}
-	}
-	dimnames(acceptance_grid) <- list(a_vals, b_vals)
-	return(acceptance_grid)
-}
-
-(tune_results <- tune_acceptance_rate(
-	a_vals = seq(30, 40, by=1), 
-	b_vals = seq(30, 40, by=1)))
-
-result <- gammaSamp(
-	data = data, 
-	B = 40000, 
-	p = 1, q = 1, r = 1, s = 1, 
-	a1 = 34, b1 = 38, 
-	alpha_start = 1, 
-	beta_start = 1)
