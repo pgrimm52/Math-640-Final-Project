@@ -20,7 +20,6 @@ all_storms    <- tweet_storms %>% pull(days_elapsed)
 pre_election  <- tweet_storms %>% filter(!post_election) %>% pull(days_elapsed)
 post_election <- tweet_storms %>% filter(post_election) %>% pull(days_elapsed)
 
-
 ###############
 # B. Examine different posteriors 
 # (always source sampler file before runs, since posteriors overwrite each other) 
@@ -100,7 +99,7 @@ tune_acceptance_rate(
 # 2. Sample 
 gamma_samples <- gammaSamp(data = all_storms, B = 10000,
 													 a1 = 64, b1 = 67,
-													 p=1, q=1, r=1, s=1,
+													 p=1, q=2, r=2, s=2,
 													 alpha_start = 1, beta_start = 1)
 
 # 3. Check for convergence
