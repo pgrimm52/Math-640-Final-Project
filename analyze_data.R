@@ -74,36 +74,36 @@ tune_acceptance_rate(
 	alpha_start = 1, beta_start = 1) # settle on Gamma(60, 63) with ~43% acceptance
 
 # 2. Sample 
-gamma_samples <- gammaSamp(data = all_storms, B = 10000,
+gamma_samples_noninf <- gammaSamp(data = all_storms, B = 10000,
 													 a1 = 60, b1 = 63,
 													 p=1, q=0, r=0, s=0,
 													 alpha_start = 1, beta_start = 1)
 
 # 3. Check for convergence
-mcmcplot2(gamma_samples$alpha)
-mcmcplot2(gamma_samples$beta)
+mcmcplot2(gamma_samples_noninf$alpha)
+mcmcplot2(gamma_samples_noninf$beta)
 
 # 4. Grab Gamma parameters
-lapply(gamma_samples, mean)
-lapply(gamma_samples, median)
+lapply(gamma_samples_noninf, mean)
+lapply(gamma_samples_noninf, median)
 
 # INFORMATIVE
 # 1. Tune with Gamma proposal
 # Not necessary
 
 # 2. Sample 
-gamma_samples <- gammaSamp(data = all_storms, B = 10000,
+gamma_samples_inf <- gammaSamp(data = all_storms, B = 10000,
 													 a1 = 64, b1 = 67,
 													 p=10, q=10, r=10, s=10,
 													 alpha_start = 1, beta_start = 1)
 
 # 3. Check for convergence
-mcmcplot2(gamma_samples$alpha)
-mcmcplot2(gamma_samples$beta)
+mcmcplot2(gamma_samples_inf$alpha)
+mcmcplot2(gamma_sample_infs$beta)
 
 # 4. Grab Gamma parameters
-lapply(gamma_samples, mean)
-lapply(gamma_samples, median)
+lapply(gamma_samples_inf, mean)
+lapply(gamma_samples_inf, median)
 
 
 # WEIBULL #############################
@@ -174,7 +174,6 @@ plot(density(all_storms, from=0), lwd=2, ylim=c(0, 0.4))
 curve(dlnorm(x, 0.4351, sqrt(1.086)), col="green", lwd=2, lty=2, add=TRUE)
 curve(dgamma(x, 0.9197, 0.3163), col="blue", lwd=2, lty=2, add=TRUE)
 curve(dweibull(x, 0.9083, 2.8735), col="red", lwd=2, lty=2, add=TRUE)
-
 
 # Show replicated moment distribution with original data
 show_replicate_analysis(all_storms, rlnorm, lognorm_samples$mu, sqrt(lognorm_samples$sig2)) # remember sqrt!
