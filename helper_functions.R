@@ -126,3 +126,33 @@ show_replicate_analysis <- function(data, rdistribution, sampled_parameter1, sam
 	hist(replicated_stats[4, ], main = "Skewness"); abline(v = original_stats[4], col = "red"); legend("topright", paste("P-value:\n", pval[4], sep=""), bty="n")
 	hist(replicated_stats[5, ], main = "Kurtosis"); abline(v = original_stats[5], col = "red"); legend("topright", paste("P-value:\n", pval[5], sep=""), bty="n")
 }
+
+#####################################
+# 8. DIC CALCULATOR
+calc_DIC <- function(data, ddistribution, params){
+	# first col of theta = sig2, second and beyond = beta_x
+	params_hat <- apply(params, 2, mean)
+
+	# intermediate vector that loops through all theta_b and returns Likelihood
+	Like_b <- apply(
+		params,
+		1,
+		function(params_b){ ddistribution(data, params_b[1], params_b[2]) })
+
+	# Calc and return DIC
+	pDIC <- 2 * ( sum(log(ddistribution(data, params_hat[1], params_hat[2]))) - 1/nrow(params) * sum(log(Like_b)) )
+	DIC <- -2*sum(log(ddistribution(data, params_hat[1], params_hat[2]))) + 2*pDIC
+
+	return(DIC)
+}
+
+#####################################
+# 9. CATERPLOT2
+
+caterplot2 <- function(data1, title1, data2, title2, ...){
+	m <- matrix(cbind(data1, data2), ncol=2)
+	colnames(m)	<- c(title1, title2)
+	caterplot(m, denstrip = TRUE, ...)
+}
+
+
